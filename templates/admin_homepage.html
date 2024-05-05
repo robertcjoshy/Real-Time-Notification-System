@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Message</title>
+    <link rel="stylesheet" href="/assets/admin_style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Send Message</h1>
+        <form id="messageForm">
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" placeholder="Subject" required>
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" placeholder="Enter your message here..." required></textarea>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById("messageForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get form data
+            var formData = {
+                subject: document.getElementById("subject").value,
+                message: document.getElementById("message").value
+            };
+
+            // Make POST request
+            fetch("/admin/sendmessage", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json()) // Parse response as JSON
+            .then(data => {
+                // Check if data is recorded successfully
+                if (data.success) {
+                    alert("Message sent successfully!");
+                    document.getElementById("messageForm").reset();
+                } else {
+                    alert("Failed to send message. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred while sending the message. Please try again later.");
+            });
+        });
+    </script>
+</body>
+</html>
+
