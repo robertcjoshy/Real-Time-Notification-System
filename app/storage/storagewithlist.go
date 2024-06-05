@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/robert/notification/app/entity"
@@ -25,7 +26,9 @@ func Newmemorywithlist(size int) Storage {
 }
 
 func (m *Memorywithlist) Push(ctx context.Context, clientid int, notification entity.Notification) error {
+	fmt.Println("inside push")
 	item := m.get(clientid)
+	fmt.Println("AFTER get")
 	item.mu.Lock()
 	defer item.mu.Unlock()
 
