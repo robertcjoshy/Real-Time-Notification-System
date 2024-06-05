@@ -3,9 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>User Homepage</title>
+    <script>/*
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/user/notification')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Display the notifications
+                        console.log(data.message);
+                        // Here you could update the DOM to show the notifications
+                        document.getElementById('notifications').innerText = data.message;
+                    }
+                })
+                .catch(error => console.error('Error fetching notifications:', error));
+        });*/
+        function fetchNotifications() {
+            fetch('/user/notification')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Display the notifications
+                        console.log(data.message);
+                        // Update the DOM to show the notifications
+                        document.getElementById('notifications').innerText = data.message;
+                    }
+                    // Immediately call fetchNotifications again to poll
+                    fetchNotifications();
+                })
+                .catch(error => {
+                    console.error('Error fetching notifications:', error);
+                    // Retry immediately after an error
+                    fetchNotifications();
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start polling for notifications
+            fetchNotifications();
+        });
+    </script>
 </head>
 <body>
-    <h1> welcome user</h1>
+    <h1>Welcome to User Homepage</h1>
+    <div id="notifications"></div> <!-- Placeholder for notifications -->
 </body>
 </html>
