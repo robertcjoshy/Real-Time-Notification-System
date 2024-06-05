@@ -1,17 +1,21 @@
 package entity
 
-import "time"
-
 type Notification interface {
 	Isnotification()
 }
 
 type Basenotification struct {
-	Createdat time.Time `json:"createdat"`
+	Createdat int64
 }
 
 func (Basenotification) Isnotification() {}
 
+type Messagenotification struct {
+	Basenotification
+	Noty string
+}
+
+/*
 type Unreadworkrequest struct {
 	Basenotification
 	Workid int    `json:"workid"`
@@ -22,3 +26,4 @@ type Unreadmessagenotification struct {
 	Basenotification
 	Count int `json:"count"`
 }
+*/
