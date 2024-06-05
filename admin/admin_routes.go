@@ -5,12 +5,12 @@ import (
 	"github.com/robert/notification/admin/admin_handler"
 )
 
-func Admin_routes(r *gin.Engine) {
+func Admin_routes(r *gin.Engine, admin_bolbol *admin_handler.Server) {
 	AdminGroup := r.Group("/admin")
 	{
 		AdminGroup.GET("/login", admin_handler.Login)
 		AdminGroup.POST("/login", admin_handler.Loginpost)
 		AdminGroup.GET("/logout", admin_handler.Logout)
-		AdminGroup.POST("/sendmessage", admin_handler.SendNotification)
+		AdminGroup.POST("/sendmessage", admin_bolbol.SendNotification)
 	}
 }
