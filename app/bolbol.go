@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/robert/notification/app/entity"
@@ -24,6 +25,12 @@ func Newbolbol(str storage.Storage, sig signal.Signal) *Bobol {
 	}
 }
 
+var (
+	mut            sync.Mutex
+	hasuserfetched = make(map[int]bool, 0)
+	lastseen       = make(map[int]time.Time)
+)
+
 func Build() *Bobol {
 	fmt.Println("inside build function")
 	str := storage.Newmemorywithlist(100)
@@ -31,29 +38,70 @@ func Build() *Bobol {
 	return Newbolbol(str, sig)
 }
 
-func (b *Bobol) Getnotifications(ctx context.Context, clientid int) ([]entity.Notification, error) {
-	c, err := b.storage.Count(ctx, clientid)
-	if err != nil {
-		return nil, fmt.Errorf("no value in count")
+/*
+	func (b *Bobol) Getnotifications(ctx context.Context, clientid int, timestamp int64) ([]entity.Notification, error) {
+		c, err := b.storage.Count(ctx, clientid)
+		if err != nil {
+			return nil, fmt.Errorf("no value in count")
+		}
+		if c > 0 {
+			return b.storage.Popall(ctx, clientid)
+		}
+		ch, close, err := b.signal.Subscribe(clientid)
+		defer close()
+		if err != nil {
+			return nil, fmt.Errorf("cannnot retrive channel in subcribe")
+		}
+		ctx, ctxcancel := context.WithTimeout(ctx, b.defualtimeout)
+		defer ctxcancel()
+
+		select {
+		case <-ch:
+			return b.storage.Pop(ctx, clientid, timestamp)
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		}
 	}
-	if c > 0 {
-		return b.storage.Popall(ctx, clientid)
+*/
+func (b *Bobol) Getnotifications(ctx context.Context, clientID int, timestamp int64) ([]entity.Notification, error) {
+
+	mut.Lock()
+	isFirstRequest := !hasuserfetched[clientID]
+	if isFirstRequest {
+		hasuserfetched[clientID] = true
 	}
-	ch, close, err := b.signal.Subscribe(clientid)
+	mut.Unlock()
+
+	if isFirstRequest {
+		notifications, err := b.storage.Popall(ctx, clientID)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+		lastseen[clientID] = time.Now()
+		fmt.Println("popall = ", notifications)
+		return notifications, nil
+	}
+
+	// If this is not the first request, subscribe to the signal channel for new notifications
+	ch, close, err := b.signal.Subscribe(clientID)
 	defer close()
 	if err != nil {
-		return nil, fmt.Errorf("cannnot retrive channel in subcribe")
+		return nil, fmt.Errorf("failed to subscribe to channel: %v", err)
 	}
-	ctx, ctxcancel := context.WithTimeout(ctx, b.defualtimeout)
-	defer ctxcancel()
+
+	// Wait for either a notification or a timeout
+	ctx, cancel := context.WithTimeout(ctx, b.defualtimeout)
+	defer cancel()
 
 	select {
 	case <-ch:
-		return b.storage.Popall(ctx, clientid)
+		// If a notification is received, fetch and return new notifications
+		return b.storage.Pop(ctx, clientID, &mut, lastseen)
 	case <-ctx.Done():
+		// If timeout occurs, return error indicating timeout
 		return nil, ctx.Err()
 	}
-
 }
 
 func (b *Bobol) Notify(ctx context.Context, clientid int, notification entity.Notification) error {
@@ -65,6 +113,7 @@ func (b *Bobol) Notify(ctx context.Context, clientid int, notification entity.No
 	}
 	errr := b.signal.Publish(clientid)
 	if errr != nil {
+		fmt.Println("ERROR IN notify = ", errr)
 		return errr
 	}
 	return nil
