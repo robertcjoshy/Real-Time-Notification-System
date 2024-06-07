@@ -1,7 +1,9 @@
 package user_handler
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/robert/notification/app"
@@ -53,7 +55,7 @@ func (s *Server) User_login(c *gin.Context) {
 	// Dummy check for username and password
 	if username == "robertcjoshy" && password == "1001" {
 		// Render the user homepage first
-		c.HTML(200, "userhomepage.html", gin.H{})
+		c.HTML(200, "usernotificationpage.html", gin.H{})
 		return
 	}
 
@@ -65,7 +67,7 @@ func User_logout(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/user")
 }
 
-func (s *Server) Notifymessage(c *gin.Context, id int) ([]entity.Notification, error) {
+func (s *Server) Notifymessage(c *gin.Context, id int, timestamp int64) ([]entity.Notification, error) {
 	//id := c.Param("id")
 	/*
 		//lastupdate, err := strconv.ParseInt(time, 10, 54)
@@ -77,7 +79,7 @@ func (s *Server) Notifymessage(c *gin.Context, id int) ([]entity.Notification, e
 		}
 	*/
 	//var s app.Bobol
-	nots, err := s.Bolbol.Getnotifications(c, id)
+	nots, err := s.Bolbol.Getnotifications(c, id, timestamp)
 	if err != nil {
 		return nil, err
 	}
@@ -87,15 +89,24 @@ func (s *Server) Notifymessage(c *gin.Context, id int) ([]entity.Notification, e
 }
 
 func (s *Server) FetchNotifications(c *gin.Context) {
-	id := 1001 // This should be dynamically determined based on the logged-in user
-	nots, err := s.Notifymessage(c, id)
+
+	id := 1001                     // This should be dynamically determined based on the logged-in user
+	timestamp := time.Now().Unix() // this hsuld be dynamically determined
+
+	nots, err := s.Notifymessage(c, id, timestamp)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error fetching notifications"})
+		fmt.Println("error in fetching notification or no notification")
+		c.JSON(200, gin.H{"error": "error fetching notifications"}) // it must show internel server error but changeged to 200
 		return
 	}
 	n := len(nots)
-	specific := nots[0]
-	data := specific.(entity.Messagenotification).Noty
+	//specific := nots[0]
+	//data := specific.(entity.Messagenotification).Noty
+	data := make([]string, 0)
+	for _, value := range nots {
+		temp := value.(entity.Messagenotification).Noty
+		data = append(data, temp)
+	}
 	//fmt.Println(specific.Isnotification())
 	/*for _, ele := range nots {
 		if not, ok := ele.(entity.Messagenotification); ok {
