@@ -1,7 +1,7 @@
 package signal
 
 import (
-	"fmt"
+	"log"
 	"sync"
 )
 
@@ -29,7 +29,7 @@ func (c *signal) Subscribe(id int) (<-chan struct{}, func(), error) {
 	ch := make(chan struct{}, 1)
 	t.Listeners = append(t.Listeners, ch)
 	return ch, func() {
-		fmt.Println("INSIDE CHANNEL CLEARING FUNCTION")
+		log.Println("INSIDE CHANNEL CLEARING FUNCTION")
 		t.mu.Lock()
 		defer t.mu.Unlock()
 		for i := 0; i < len(t.Listeners); i++ {
@@ -41,11 +41,11 @@ func (c *signal) Subscribe(id int) (<-chan struct{}, func(), error) {
 }
 
 func (c *signal) Publish(id int) error {
-	fmt.Println("INSIDE PUBLISH")
-	fmt.Println(id)
+	log.Println("INSIDE PUBLISH")
+	log.Println(id)
 	tpicinfo, ok := c.Listeners.Load(id)
 	if !ok {
-		fmt.Println("returning from publish")
+		log.Println("returning from publish")
 		return nil
 	}
 	t := tpicinfo.(*topic)
@@ -54,7 +54,7 @@ func (c *signal) Publish(id int) error {
 		return err
 	}
 	for _, value := range t.Listeners {
-		fmt.Println("channel inside listeners = ", value)
+		log.Println("channel inside listeners = ", value)
 		value <- struct{}{}
 	}
 	return nil

@@ -2,7 +2,7 @@ package storage
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"sync"
 	"time"
 
@@ -27,9 +27,9 @@ func Newmemorywithlist(size int) Storage {
 }
 
 func (m *Memorywithlist) Push(ctx context.Context, clientid int, notification entity.Notification) error {
-	fmt.Println("inside push")
+	log.Println("inside push")
 	item := m.get(clientid)
-	fmt.Println("AFTER get")
+	log.Println("AFTER get")
 	item.mu.Lock()
 	defer item.mu.Unlock()
 
@@ -50,7 +50,8 @@ func (m *Memorywithlist) Count(ctx context.Context, clientid int) (int, error) {
 func (m *Memorywithlist) Pop(ctx context.Context, clientid int, mut *sync.Mutex, lastseen map[int]time.Time) ([]entity.Notification, error) {
 	item := m.get(clientid)
 	var notification []entity.Notification
-	if len(item.notifications) == 0 {
+	n := len(item.notifications)
+	if n == 0 {
 		return nil, Errempty
 	}
 
@@ -59,6 +60,7 @@ func (m *Memorywithlist) Pop(ctx context.Context, clientid int, mut *sync.Mutex,
 	if !ok {
 		tiime = time.Time{}
 	}
+
 	mut.Unlock()
 	item.mu.Lock()
 	for _, value := range item.notifications {
@@ -66,15 +68,13 @@ func (m *Memorywithlist) Pop(ctx context.Context, clientid int, mut *sync.Mutex,
 		data := time.Unix(nottime, 0)
 		if data.After(tiime) {
 			notification = append(notification, value.(entity.Messagenotification))
+			lastseen[clientid] = data
 			//return nil, Errempty
 		}
 	}
 	item.mu.Unlock()
 
-	//notification := item.notifications[0]
-
-	//item.notifications = item.notifications[1:]
-	fmt.Println("pop = ", notification)
+	log.Println("pop = ", notification)
 	return notification, nil
 }
 
@@ -87,11 +87,7 @@ func (m *Memorywithlist) Popall(ctx context.Context, clientid int) ([]entity.Not
 
 	item.mu.Lock()
 	defer item.mu.Unlock()
-	/*
-		defer func() {
-			item.notifications = nil
-		}()
-	*/
+
 	return item.notifications, nil
 
 }

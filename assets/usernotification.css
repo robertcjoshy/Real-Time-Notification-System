@@ -41,6 +41,27 @@ header{
     border-radius: 0.5rem;
     margin-left: 10px;
 }
+/* Add this to your existing CSS */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#logout-button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#logout-button:hover {
+    background-color: darkred;
+}
+
 #mark-as-read{
     color: gray;
     cursor: pointer;
@@ -58,7 +79,7 @@ main{
     display: flex;
     align-items: center;
     padding: 1rem;
-    border-radius: 1rem;
+    border-bottom: 1px solid #5a5a5b;
 }
 .notificationCard img{
     width: 50px;

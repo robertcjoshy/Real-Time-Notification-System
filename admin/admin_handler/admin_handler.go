@@ -1,7 +1,7 @@
 package admin_handler
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -47,20 +47,20 @@ func (s *Server) SendNotification(c *gin.Context) {
 	var message Message
 
 	err := c.BindJSON(&message)
-	fmt.Println("message = ", message)
+	log.Println("message = ", message)
 	//var actual_notification entity.Messagenotification
 	if err != nil {
-		fmt.Println("error in binding = ", err)
+		log.Println("error in binding = ", err)
 		c.JSON(http.StatusOK, gin.H{"success": false})
 		c.Abort()
 		return
 	}
 
 	id, _ := strconv.Atoi(message.Subject)
-	fmt.Println("subject to string = ", id)
+	log.Println("subject to string = ", id)
 	errr := s.Bolbol.Notify(c, id, entity.Messagenotification{Basenotification: entity.Basenotification{Createdat: time.Now().Unix()}, Noty: message.Message})
 	if errr != nil {
-		fmt.Println("error in notify function = ", errr)
+		log.Println("error in notify function = ", errr)
 		c.JSON(http.StatusOK, gin.H{"success": false})
 		c.Abort()
 		return
