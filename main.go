@@ -8,16 +8,19 @@ import (
 	"os/signal"
 	"time"
 
+	"golang.org/x/time/rate"
+
 	"github.com/gin-gonic/gin"
 	"github.com/robert/notification/admin"
 	"github.com/robert/notification/admin/admin_handler"
 	"github.com/robert/notification/app"
+	m "github.com/robert/notification/middlewares"
 	"github.com/robert/notification/user"
 	"github.com/robert/notification/user/user_handler"
 )
 
 func main() {
-	//gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
@@ -28,6 +31,11 @@ func main() {
 	router.LoadHTMLGlob("templates/*.html")
 	user.User_routes(router, user_bolbol)
 	admin.Admin_routes(router, admin_bolbol)
+
+	// ratelimiter
+	limiter := rate.NewLimiter(1, 5) // Example: Allow 5 requests per second with burst of 1
+	router.Use(m.RateLimitMiddleware(limiter))
+
 	// Create the server
 	srv := &http.Server{
 		Addr:    ":8080",
