@@ -1,16 +1,12 @@
 # Real-Time Notification System
 
 
+
 ## Overview
 
 This is a real-time notification system built using the Gin web framework in Go. It allows administrators to send notifications to users. Users can log in to see notifications, and if there are no new notifications, a long-polling technique is used to receive notifications as soon as they arrive.
 
-## Features
 
-Admin can send notifications to users.
-Users can log in to view their notifications.
-Long-polling is used to provide real-time updates to users.
-Secure authentication and authorization.
 
 ## Prerequisites
 
@@ -20,11 +16,13 @@ Secure authentication and authorization.
 ## Installation
 
 1.Install dependencies
+```
   - go mod tidy
-    
+``` 
 2.Start the server
+```
   - go run main.go
-
+```
 ## Usage
 
 **1.Admin:**
