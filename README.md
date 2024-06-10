@@ -21,6 +21,7 @@ Gin web framework
 
 1.Install dependencies
   - go mod tidy
+    
 2.Start the server
   - go run main.go
 
@@ -37,12 +38,12 @@ Gin web framework
 ## API Endpoints
 
 1.Admin Endpoints:
-**- POST /admin/login**
-**- POST /admin/sendnotifications**
+  - **POST /admin/login**
+  - **POST /admin/sendnotifications**
 
 2.User Endpoints:
-**- POST /user/login**
-**- GET /user/notifications**
+  - **POST /user/login**
+  - **GET /user/notifications**
 
 ## Project Structure
 
