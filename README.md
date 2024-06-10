@@ -69,6 +69,14 @@ notification-system/
     └── routes.go
 ```
 
+## images
+
+![](https://github.com/robertcjoshy/Real-Time-Notification-System/blob/main/images/img1.png)
+![](https://github.com/robertcjoshy/Real-Time-Notification-System/blob/main/images/img2.png)
+![](https://github.com/robertcjoshy/Real-Time-Notification-System/blob/main/images/img3.png)
+
+
+
 ### Contributing
 
 Contributions are welcome! Please create an issue or submit a pull request.
