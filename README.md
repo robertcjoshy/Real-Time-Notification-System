@@ -14,8 +14,8 @@ Secure authentication and authorization.
 
 ## Prerequisites
 
-Go 1.16 or later
-Gin web framework
+  - Go 1.16 or later
+  - Gin web framework
 
 ## Installation
 
@@ -48,7 +48,7 @@ Gin web framework
 ## Project Structure
 
 ### go
-
+```
 notification-system/
 ├── main.go
 ├── admin/
@@ -69,7 +69,8 @@ notification-system/
 └── user/
     └── handler.go
     └── routes.go
-    
+```
+
 ### Contributing
 
 Contributions are welcome! Please create an issue or submit a pull request.
